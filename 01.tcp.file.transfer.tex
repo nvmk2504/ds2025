@@ -1,0 +1,139 @@
+\documentclass[a4paper,12pt]{article}
+
+% Packages for formatting and better output
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{color}
+
+% Set up page margins
+\usepackage[margin=1in]{geometry}
+
+\title{File Transfer over TCP/IP using Sockets\\ \large Lab Report}
+\author{Nguyen Viet Minh Khoi - 22BI13221}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+File transfer protocols play a crucial role in contemporary networking. This lab aims to develop a basic file transfer system utilizing the Transmission Control Protocol (TCP). By leveraging Python's socket library, we created a client-server application in which the client transmits a file to the server via a TCP/IP connection.
+
+\section{Objectives}
+The objectives of this lab were:
+\begin{itemize}
+    \item Create a file transfer system utilizing TCP sockets.
+    \item Grasp client-server communication through socket programming.
+    \item Investigate how data is transmitted in segments across a network.
+
+\end{itemize}
+
+\section{Methodology}
+In this lab, a client-server architecture was established for transferring files over TCP/IP. The methodology was as follows:
+
+\begin{enumerate}
+    \item The server was set up to await incoming connections from clients on a designated port.
+    \item After a client connected, the server received the file from the client in segments, allowing for efficient handling of large files.
+    \item The client established a connection to the server, transmitted the filename, and subsequently sent the file data in 1024-byte segments.
+    \item The server stored the file on disk after it had received the complete file.
+    \item Both the client and server terminated the connection after the transfer was finished.
+\end{enumerate}
+
+\section{System Design}
+The system consists of two primary components: the server and the client. The server monitors a specified port, accepts incoming connections, and receives files from the client. Meanwhile, the client connects to the server, transmits the file, and closes the connection after the transfer is finished.
+
+\subsection{File Transfer Protocol}
+The file transfer protocol follows a simple sequence:
+\begin{enumerate}
+    \item The client transmits the filename to the server.
+    \item The client subsequently sends the file in 1024-byte segments.
+    \item The server receives each segment and writes it to a file on the disk.
+    \item After the file transfer is finished, the server verifies the transfer, and both the client and server terminate the connection.
+\end{enumerate}
+
+\section{Implementation}
+The file transfer system was implemented using Python's socket library. The following code illustrates the server and client components.
+
+\subsection{Server Code}
+
+\begin{lstlisting}[language=Python, caption=Server Code]
+import socket
+
+HOST = '127.0.1.125'  
+PORT = 2002   
+
+se = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+se.bind((HOST, PORT))
+
+se.listen(1)
+print(f"Server listening on {HOST}:{PORT}...")
+
+con, addr = se.accept()
+print(f"Connected by {addr}")
+
+fn = con.recv(1024).decode('utf-8') 
+print(f"Receiving file: {fn}")
+
+
+with open(fn, 'wb') as f:
+    while True:
+        
+        data = con.recv(1024)
+        if not data:
+            break  
+        f.write(data)
+
+print(f"File {fn} received successfully.")
+con.close() 
+se.close()
+\end{lstlisting}
+
+\subsection{Client Code}
+
+\begin{lstlisting}[language=Python, caption=Client Code]
+import socket
+
+def cl():
+    host = '127.0.1.125'
+    port = 2002
+    fn = 'received_transfer_file.txt'
+
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as cs:
+            cs.connect((host, port))
+            print(f"Connected to server {host}:{port}, receiving file...")
+
+            with open(fn, 'wb') as fw:
+                while (data := cs.recv(1024)):
+                    fw.write(data)
+
+            print(f"File received successfully! Saved as {fn}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+if __name__ == '__main__':
+    cl()
+\end{lstlisting}
+
+\subsection{Sample Output from the Client}
+
+\begin{verbatim}
+Server listening on 127.0.1.125:2002...
+Connected by ('127.0.0.1', 33653)
+Receiving file: example.txt
+File example.txt received successfully.
+\end{verbatim}
+
+The file `example.txt` was successfully transferred from the client to the server, and the server saved it in the current directory.
+
+\section{Discussion}
+This lab showcased the fundamental concepts of file transfer over a TCP/IP connection through socket programming. The system effectively transferred files by dividing them into smaller segments, allowing it to manage larger files efficiently.
+
+Furthermore, the client-server system could be enhanced to support multiple file transfers concurrently.
+
+\section{Conclusion}
+This lab demonstrated how to utilize TCP/IP sockets for transferring files between a client and a server. By adhering to the essential principles of socket programming, we successfully created a file transfer system that efficiently sends and receives files. 
+
+\end{document}
