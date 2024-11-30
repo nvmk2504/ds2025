@@ -10,7 +10,7 @@ Student Info
 =========================
 * Student Name: Nguyễn Việt Minh Khôi
 * Student ID: 22BI13221
-* Student Group ID: Not-for-now
+* Student Group ID: 1
 
 
 
