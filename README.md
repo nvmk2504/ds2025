@@ -8,7 +8,7 @@ Students are expected to:
 
 Student Info
 =========================
-* Student name:Nguyễn Việt Minh Khôi
+* Student name: Nguyễn Việt Minh Khôi
 * Student ID: 22BI13221
 * Student Group ID: Not-for-now
 
