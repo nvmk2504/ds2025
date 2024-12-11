@@ -1,0 +1,68 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+\title{Practical work 2}
+
+\begin{document}
+\author{Nguyen Viet Minh Khoi}
+\maketitle
+
+\section*{RPC Service Design}
+The RPC service is built using Python's built-in xmlrpc library. The server provides a function called send_file(), which opens a file in binary mode and transfers its contents to the client.
+
+
+\section*{System Organization}
+Two components are:
+\begin{enumerate}
+    \item \textbf{Server:} Hosts the RPC function for file transfer.
+    \item \textbf{Client:} Requests the file and saves it locally.
+\end{enumerate}
+
+
+\section*{Implementation}
+\subsection*{Code Snippet: Server}
+\begin{verbatim}
+    from xmlrpc.server import SimpleXMLRPCServer
+
+    def save(name, data):
+    
+        try:
+            with open(name, 'wb') as file:
+                file.write(data.data)
+            return f"File '{name}' received and saved."
+        except Exception as e:
+            return f"Failed to save file: {e}"
+    
+    if __name__ == '__main__':
+    
+        server = SimpleXMLRPCServer(('127.0.0.1', 25041), allow_none=True)
+        server.register_function(save, "save_file")
+        print("Server running at 127.0.0.1:25041")
+        server.serve_forever()
+\end{verbatim}
+
+\subsection*{Code Snippet: Client}
+\begin{verbatim}
+    import xmlrpc.client
+
+    def upload(name):
+    
+        try:
+            with open(name, 'rb') as file:
+                binary_data = file.read()
+            response = rpc_server.save_file(name, xmlrpc.client.Binary(binary_data))
+            print(response)
+        except Exception as e:
+            print(f"Error: {e}")
+    
+    if __name__ == '__main__':
+    
+        rpc_server = xmlrpc.client.ServerProxy('http://127.0.0.1:25041')
+    
+        file_to_send = 'transfer_file.txt'
+        upload(file_to_send)
+\end{verbatim}
+
+\end{document}
